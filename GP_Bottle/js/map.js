@@ -1,7 +1,7 @@
 /**
  * Created by ben3029 on 10/29/14.
  */
-var map, gp, toolbar, mapClick;
+var map, gp, mapClick;
 
 require(["esri/map",
         "esri/tasks/Geoprocessor",
@@ -17,7 +17,7 @@ require(["esri/map",
         "dojo/dom",
         "dojo/domReady!"],
 
-    function (Map, Geoprocessor, Draw, PictureMarkerSymbol, SimpleMarkerSymbol, SimpleLineSymbol, Color, Graphic, FeatureSet, on, dom) {
+    function (Map, Geoprocessor, PictureMarkerSymbol, SimpleMarkerSymbol, SimpleLineSymbol, Color, Graphic, FeatureSet, on, dom) {
         map = new Map("map", {
             basemap: "oceans",
             center: [-43.682, 32.99], // longitude, latitude
@@ -30,6 +30,12 @@ require(["esri/map",
             wkid: 102100
         });
 
+        //Connect the GP Tool to the map click event
+        on(dom.byId("gpSet"), "click", setMapClick);
+
+        //Dis-connect the GP Tool from the map click event
+        on(dom.byId("gpRemove"), "click", removeMapClick);
+
         function setMapClick() {
             mapClick = map.on("click", executeParticleTrack);
         }
@@ -37,12 +43,6 @@ require(["esri/map",
         function removeMapClick() {
             mapClick.remove();
         }
-
-        //Connect the GP Tool to the map click event
-        on(dom.byId("gpSet"), "click", setMapClick);
-
-        //Dis-connect the GP Tool from the map click event
-        on(dom.byId("gpRemove"), "click", removeMapClick);
 
         function executeParticleTrack(evt) {
             //Clear graphics layer
