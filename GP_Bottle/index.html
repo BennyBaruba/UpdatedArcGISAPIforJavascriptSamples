@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Message in a Bottle Geoprocessing Task</title>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.11/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.11/esri/css/esri.css">
+    <link rel="stylesheet" href="css/layout.css">
+
+    <script src="http://js.arcgis.com/3.11/"></script>
+    <script src="js/map.js"></script>
+
+</head>
+
+<body>
+<div id="map"></div>
+<div id="info" class="esriSimpleSlider">
+    Message in a Bottle Geoprocessing Task
+    <ol>
+        <li> Set number of days
+            <input type="text" id="days" value="180" size="3"/></li>
+        <li>Connect the GP tool to the mapClick event
+            <button id="gpSet">Initialize GP Tool</button>
+        </li>
+        <li> Click on the map to execute the tool</li>
+        <li>Disconnect the GP tool from the mapClick event
+            <button id="gpRemove">De-initialize GP Tool</button>
+        </li>
+    </ol>
+
+</div>
+</body>
+</html>l>

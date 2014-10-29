@@ -1,0 +1,26 @@
+html, body, #map {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #FFF;
+    overflow: hidden;
+    font-family: "Trebuchet MS";
+}
+
+#info {
+    top: 15px;
+    color: #444;
+    height: auto;
+    font-family: arial;
+    left: 60px;
+    margin: 5px;
+    padding: 10px;
+    position: absolute;
+    text-align: left;
+    width: 200px;
+    z-index: 40;
+}
