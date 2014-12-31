@@ -1,0 +1,23 @@
+html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+body {
+    background-color:#EFEFDE;
+    overflow:hidden;
+    font-family: "Trebuchet MS";
+}
+.pane {
+    border: solid 1px #9CAA9C;
+    margin: 5px;
+    padding: 5px;
+}
+#header {
+    background-color:#EFEFDE;
+    color:#9CAA9C;
+    font-size:16pt;
+    text-align:left;
+    font-weight:bold;
+    padding-top:10px; padding-bottom:10px; padding-left:10px; padding-right: 10px;
+    margin-top:0px; margin-bottom:0px;
+}
+
+#banner {
+    height:40px; width:100%;
