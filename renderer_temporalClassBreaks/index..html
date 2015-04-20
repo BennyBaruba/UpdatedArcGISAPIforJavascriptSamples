@@ -22,97 +22,126 @@
             -moz-border-radius: 4px;
         }
         .labelText{
+            text-align: center;
             color:#9CAA9C;
             font-size:12pt;
             font-family:"Tahoma";
             margin:5px;
         }
         .headerText{
+            text-align: center;
             color:#9CAA9C;
             font-size:16pt;
             font-weight:bold;
             font-family: "Tahoma";
         }
+
+
     </style>
 
-    <script>var dojoConfig = { parseOnLoad: true };</script>
+
     <script src="http://js.arcgis.com/3.13/"></script>
+
     <script>
-        dojo.require("esri.map");
-        dojo.require("dojo.date.locale");
-        dojo.require("esri.layers.FeatureLayer");
-        dojo.require("esri.dijit.TimeSlider");
-        dojo.require("esri.tasks.query");
-        dojo.require("dijit.layout.ContentPane");
-        dojo.require("dijit.layout.BorderContainer");
 
         var map, timeSlider, featureLayer, timeExtent;
 
-        function init() {
+        require([ "esri/map",
+                    "esri/layers/FeatureLayer",
+                    "esri/dijit/TimeSlider",
+                    "esri/tasks/query",
+                    "esri/InfoTemplate",
+                        "esri/TimeExtent",
+
+                    "dijit/layout/ContentPane",
+                    "dijit/layout/BorderContainer",
+
+                    "dojo/parser",
+
+                    "dojo/date/locale",
+                    "dojo/domReady!"],
+
+                function(Map,
+                         FeatureLayer,
+                         TimeSlider,
+                         query,
+                         InfoTemplate,
+                         TimeExtent,
+
+                         ContentPane,
+                         BorderContainer,
+
+                         parser,
+                         locale) {
+
+                    parser.parse();
+
             map = new esri.Map("map", {
-                basemap: "streets",
+                basemap: "oceans",
                 center: [-63.079, 27.141],
                 zoom: 4
             });
-            dojo.connect(map, "onLoad", mapLoaded);
-        }
+
+
+            map.on("load", mapLoaded);
+
 
         function mapLoaded() {
-            var infoTemplate = new esri.InfoTemplate("${EVENTID}", "<div style='text-transform:uppercase;font-weight:bold;'>${STAGE}</div>${Date_Time:DateFormat(selector:'date',datePattern:'EEE MMM d, yyyy h:mm a, z')}<br/><b>Windspeed:</b> ${WINDSPEED} <br /> <b>Location:</b> ${LAT},${LONG}<br/>");
-            featureLayer = new esri.layers.FeatureLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Hurricanes/MapServer/0", {
-                mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
-                trackIdField:"EVENTID",
+            var infoTemplate = new InfoTemplate("${EVENTID}", "<div style='text-transform:uppercase;font-weight:bold;'>${STAGE}</div>${Date_Time:DateFormat(selector:'date',datePattern:'EEE MMM d, yyyy h:mm a, z')}<br/><b>Windspeed:</b> ${WINDSPEED} <br /> <b>Location:</b> ${LAT},${LONG}<br/>");
+            featureLayer = new FeatureLayer("http://sampleserver6.arcgisonline.com/arcgis/rest/services/Hurricanes/MapServer/0", {
+                mode: FeatureLayer.MODE_SNAPSHOT,
+                trackIdField: "EVENTID",
                 infoTemplate: infoTemplate,
                 outFields: ["*"]
             });
 
             //render a particular time extent
-            timeExtent = new esri.TimeExtent();
+            timeExtent = new TimeExtent();
             timeExtent.startTime = new Date("08/04/2000 UTC");
             timeExtent.endTime = new Date("10/23/2000 UTC");
             featureLayer.setTimeDefinition(timeExtent);
 
-            var observationRenderer = new esri.renderer.UniqueValueRenderer(new esri.symbol.SimpleMarkerSymbol(),"EVENTID");
-            observationRenderer.addValue("Alberto", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([255, 153, 0])));
-            observationRenderer.addValue("Beryl", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([9, 112, 84])));
-            observationRenderer.addValue("Chris", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([153, 204, 153])));
-            observationRenderer.addValue("Debby", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([153, 51, 0])));
-            observationRenderer.addValue("Ernesto", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([102, 204, 0])));
-            observationRenderer.addValue("Florence", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([131, 76, 36])));
-            observationRenderer.addValue("Gordon", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([102, 0, 102])));
-            observationRenderer.addValue("Helene", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([153, 153, 103])));
-            observationRenderer.addValue("Isaac", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([153, 51, 102])));
-            observationRenderer.addValue("Joyce", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([102, 102, 51])));
-            observationRenderer.addValue("Keith", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([224, 204, 51])));
-            observationRenderer.addValue("Leslie", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([132, 89, 107])));
-            observationRenderer.addValue("Michael", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([100, 14, 39])));
-            observationRenderer.addValue("Nadine", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL),new dojo.Color([125, 156, 159])));
+            var observationRenderer = new esri.renderer.UniqueValueRenderer(new esri.symbol.SimpleMarkerSymbol(), "EVENTID");
+            observationRenderer.addValue("Alberto", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([255, 153, 0])));
+            observationRenderer.addValue("Beryl", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([9, 112, 84])));
+            observationRenderer.addValue("Chris", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([153, 204, 153])));
+            observationRenderer.addValue("Debby", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([153, 51, 0])));
+            observationRenderer.addValue("Ernesto", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([102, 204, 0])));
+            observationRenderer.addValue("Florence", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([131, 76, 36])));
+            observationRenderer.addValue("Gordon", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([102, 0, 102])));
+            observationRenderer.addValue("Helene", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([153, 153, 103])));
+            observationRenderer.addValue("Isaac", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([153, 51, 102])));
+            observationRenderer.addValue("Joyce", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([102, 102, 51])));
+            observationRenderer.addValue("Keith", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([224, 204, 51])));
+            observationRenderer.addValue("Leslie", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([132, 89, 107])));
+            observationRenderer.addValue("Michael", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([100, 14, 39])));
+            observationRenderer.addValue("Nadine", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_NULL), new dojo.Color([125, 156, 159])));
 
             var sls = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([86, 47, 50, 0.8]), 0.5);
             var trackRenderer = new esri.renderer.SimpleRenderer(sls);
 
-            var outline = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,new dojo.Color([255,255,255]),1.5);
-            var latestRenderer = new esri.renderer.UniqueValueRenderer(new esri.symbol.SimpleMarkerSymbol(),"EVENTID");
+            var outline = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 255, 255]), 1.5);
+            var latestRenderer = new esri.renderer.UniqueValueRenderer(new esri.symbol.SimpleMarkerSymbol(), "EVENTID");
 
-            latestRenderer.addValue("Alberto", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([255, 153, 0])));
-            latestRenderer.addValue("Beryl", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([9, 112, 84])));
-            latestRenderer.addValue("Chris", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([153, 204, 153])));
-            latestRenderer.addValue("Debby", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([153, 51, 0])));
-            latestRenderer.addValue("Ernesto", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([102, 204, 0])));
-            latestRenderer.addValue("Florence", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([131, 76, 36])));
-            latestRenderer.addValue("Gordon", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([102, 0, 102])));
-            latestRenderer.addValue("Helene", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([153, 153, 103])));
-            latestRenderer.addValue("Isaac", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([153, 51, 102])));
-            latestRenderer.addValue("Joyce", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([102, 102, 51])));
-            latestRenderer.addValue("Keith", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([224, 204, 51])));
-            latestRenderer.addValue("Leslie", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([132, 89, 107])));
-            latestRenderer.addValue("Michael", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([100, 14, 39])));
-            latestRenderer.addValue("Nadine", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE,10,outline,new dojo.Color([125, 156, 159])));
+            latestRenderer.addValue("Alberto", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([255, 153, 0])));
+            latestRenderer.addValue("Beryl", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([9, 112, 84])));
+            latestRenderer.addValue("Chris", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([153, 204, 153])));
+            latestRenderer.addValue("Debby", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([153, 51, 0])));
+            latestRenderer.addValue("Ernesto", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([102, 204, 0])));
+            latestRenderer.addValue("Florence", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([131, 76, 36])));
+            latestRenderer.addValue("Gordon", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([102, 0, 102])));
+            latestRenderer.addValue("Helene", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([153, 153, 103])));
+            latestRenderer.addValue("Isaac", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([153, 51, 102])));
+            latestRenderer.addValue("Joyce", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([102, 102, 51])));
+            latestRenderer.addValue("Keith", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([224, 204, 51])));
+            latestRenderer.addValue("Leslie", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([132, 89, 107])));
+            latestRenderer.addValue("Michael", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([100, 14, 39])));
+            latestRenderer.addValue("Nadine", new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 10, outline, new dojo.Color([125, 156, 159])));
 
             var infos = [
-                { minAge: 0, maxAge: 1, size: 15},
-                { minAge: 1, maxAge: 24, size: 11},
-                { minAge: 24, maxAge: Infinity, size: 6}
+                {minAge: 0, maxAge: 1, size: 15},
+                {minAge: 1, maxAge: 24, size: 11},
+                {minAge: 24, maxAge: Infinity, size: 6}
             ];
 
             var ager = new esri.renderer.TimeClassBreaksAger(infos, esri.renderer.TimeClassBreaksAger.UNIT_HOURS);
@@ -121,9 +150,12 @@
             featureLayer.setRenderer(renderer);
             map.addLayer(featureLayer);
 
-            dojo.connect(featureLayer, "onLoad", function(featureLayer) {
+            map.on("layer-add-result", addFeatureLayer);
+        }
+
+            function addFeatureLayer() {
                 // create time slider
-                timeSlider = new esri.dijit.TimeSlider({
+                timeSlider = new TimeSlider({
                     style: "width: 100%;"
 
                 }, dojo.byId("timeSliderDiv"));
@@ -132,29 +164,31 @@
                 timeSlider.createTimeStopsByTimeInterval(timeExtent, 5, esri.layers.TimeInfo.UNIT_HOURS);
 
                 //Display tick marks for the days
-                timeSlider.setTickCount(dojo.date.difference(timeExtent.startTime,timeExtent.endTime,"day"));
+                timeSlider.setTickCount(dojo.date.difference(timeExtent.startTime, timeExtent.endTime, "day"));
 
-                dojo.connect(timeSlider, "onTimeExtentChange", displayTimeInfo);
+                timeSlider.on("onTimeExtentChange", displayTimeInfo);
 
                 timeSlider.startup();
                 map.setTimeSlider(timeSlider);
-            });
-        }
 
-        function displayTimeInfo(timeExtent) {
-            var startTime = dojo.date.locale.format(timeExtent.startTime, {
-                selector: 'date',
-                datePattern: 'MMMM dd'
-            });
-            var endTime = dojo.date.locale.format(timeExtent.endTime, {
-                selector: 'date',
-                datePattern: 'MMMM dd'
-            });
-            var info = "Results from " + startTime + " to " + endTime;
-            dojo.byId("timeInfo").innerHTML = info;
-        }
 
-        dojo.ready(init);
+            }
+
+            function displayTimeInfo(timeExtent) {
+                var startTime = locale.format(timeExtent.startTime, {
+                    selector: 'date',
+                    datePattern: 'MMMM dd'
+                });
+                var endTime = locale.format(timeExtent.endTime, {
+                    selector: 'date',
+                    datePattern: 'MMMM dd'
+                });
+                var info = "Results from " + startTime + " to " + endTime;
+                dojo.byId("timeInfo").innerHTML = info;
+            }
+
+        });
+
     </script>
 </head>
 
@@ -171,15 +205,16 @@
          class="dijitBorders"
          style="height:90px;">
 
-        <center>
+
           <span class="headerText">
             Atlantic Hurricanes 2000
           </span>
+
             <div id="timeInfo" class="labelText">
             </div>
             <div id="timeSliderDiv">
             </div>
-        </center>
+
     </div>
 
     <div id="map"
